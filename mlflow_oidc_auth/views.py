@@ -96,6 +96,8 @@ from mlflow_oidc_auth.sqlalchemy_store import SqlAlchemyStore
 
 from mlflow.server import app
 
+from urllib import parse
+
 # Create the OAuth2 client
 auth_client = WebApplicationClient(AppConfig.get_property("OIDC_CLIENT_ID"))
 store = SqlAlchemyStore()
@@ -1008,13 +1010,13 @@ def get_groups():
 
 @catch_mlflow_exception
 def get_group_users(group_name):
-    users = store.get_group_users(group_name)
+    users = store.get_group_users(parse.unquote(group_name))
     return jsonify({"users": users})
 
 
 @catch_mlflow_exception
 def get_group_experiments(group_name):
-    experiments = store.get_group_experiments(group_name)
+    experiments = store.get_group_experiments(parse.unquote(group_name))
     return jsonify(
         [
             {
@@ -1031,14 +1033,14 @@ def get_group_experiments(group_name):
 def create_group_experiment_permission(group_name):
     experiment_id = _get_request_param("experiment_id")
     permission = _get_request_param("permission")
-    store.create_group_experiment_permission(group_name, experiment_id, permission)
+    store.create_group_experiment_permission(parse.unquote(group_name), experiment_id, permission)
     return jsonify({"message": "Group experiment permission has been created."})
 
 
 @catch_mlflow_exception
 def delete_group_experiment_permission(group_name):
     experiment_id = _get_request_param("experiment_id")
-    store.delete_group_experiment_permission(group_name, experiment_id)
+    store.delete_group_experiment_permission(parse.unquote(group_name), experiment_id)
     return jsonify({"message": "Group experiment permission has been deleted."})
 
 
@@ -1046,13 +1048,13 @@ def delete_group_experiment_permission(group_name):
 def update_group_experiment_permission(group_name):
     experiment_id = _get_request_param("experiment_id")
     permission = _get_request_param("permission")
-    store.update_group_experiment_permission(group_name, experiment_id, permission)
+    store.update_group_experiment_permission(parse.unquote(group_name), experiment_id, permission)
     return jsonify({"message": "Group experiment permission has been updated."})
 
 
 @catch_mlflow_exception
 def get_group_models(group_name):
-    models = store.get_group_models(group_name)
+    models = store.get_group_models(parse.unquote(group_name))
     return jsonify([{"name": model.name, "permission": model.permission} for model in models])
 
 
@@ -1060,14 +1062,14 @@ def get_group_models(group_name):
 def create_group_model_permission(group_name):
     model_name = _get_request_param("model_name")
     permission = _get_request_param("permission")
-    store.create_group_model_permission(group_name, model_name, permission)
+    store.create_group_model_permission(parse.unquote(group_name), model_name, permission)
     return jsonify({"message": "Group model permission has been created."})
 
 
 @catch_mlflow_exception
 def delete_group_model_permission(group_name):
     model_name = _get_request_param("model_name")
-    store.delete_group_model_permission(group_name, model_name)
+    store.delete_group_model_permission(parse.unquote(group_name), model_name)
     return jsonify({"message": "Group model permission has been deleted."})
 
 
@@ -1075,7 +1077,7 @@ def delete_group_model_permission(group_name):
 def update_group_model_permission(group_name):
     model_name = _get_request_param("model_name")
     permission = _get_request_param("permission")
-    store.update_group_model_permission(group_name, model_name, permission)
+    store.update_group_model_permission(parse.unquote(group_name), model_name, permission)
     return jsonify({"message": "Group model permission has been updated."})
 
 
