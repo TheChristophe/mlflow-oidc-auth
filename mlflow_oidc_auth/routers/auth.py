@@ -390,7 +390,15 @@ async def _process_oidc_callback_fastapi(request: Request, session) -> tuple[Opt
             return None, errors
 
         # Extract user details
-        email = userinfo.get("email") or userinfo.get("preferred_username")
+        email = None
+        for field in config.OIDC_USERNAME_FIELD:
+          email = userinfo.get(field)
+          if email is not None:
+            if not isinstance(email, str):
+              errors.append(f"Invalid OIDC username field: {field} is not a string")
+              return None, errors
+            break
+
         display_name = userinfo.get("name")
 
         if not email:
